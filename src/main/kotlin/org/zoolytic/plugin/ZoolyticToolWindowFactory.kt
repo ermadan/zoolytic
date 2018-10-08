@@ -60,12 +60,12 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
     val config: ZooStateComponent = ServiceManager.getService(ZooStateComponent::class.java)
 
     companion object Formatter {
-        private val formatter = NumberFormat.getInstance(Locale.US) as DecimalFormat;
+        private val formatter = NumberFormat.getInstance(Locale.US) as DecimalFormat
 
         init {
-            val symbols = formatter.getDecimalFormatSymbols();
-            symbols.setGroupingSeparator(' ');
-            formatter.setDecimalFormatSymbols(symbols);
+            val symbols = formatter.getDecimalFormatSymbols()
+            symbols.setGroupingSeparator(' ')
+            formatter.setDecimalFormatSymbols(symbols)
         }
 
         fun format(int: Int) : String {
@@ -198,7 +198,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
             }
         })
         tree.isRootVisible = false
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION)
         tree.addTreeExpansionListener(object : TreeExpansionListener {
             override fun treeExpanded(event: TreeExpansionEvent?) {
                 val treeNode = event!!.getPath().lastPathComponent as DefaultMutableTreeNode
@@ -313,9 +313,6 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         }
     }
 
-    fun updateTree(text: String) {
-    }
-
     private fun getToolbar(): JComponent {
         val panel = JPanel()
 
@@ -332,16 +329,6 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
 
         panel.add(actionToolBar!!.component!!)
 
-
-        val searchTextField = SearchTextField()
-        searchTextField.addDocumentListener(object : DocumentAdapter() {
-            override fun textChanged(e: DocumentEvent?) {
-                updateTree(searchTextField.text!!)
-            }
-        })
-
-
-        panel.add(searchTextField)
         return panel
     }
 
@@ -374,7 +361,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         }
 
         override fun update (e: AnActionEvent) {
-            e.getPresentation().setEnabled(removeEnabled());
+            e.getPresentation().setEnabled(removeEnabled())
         }
     }
 
@@ -384,7 +371,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         }
         return tree.selectionPaths.fold(true, {a, v ->
             val path = v.lastPathComponent
-            a && (path is ZkTreeNode) && (path?.isLeaf || path is ZkRootTreeNode)})
+            a && (path is ZkTreeNode) && (path.isLeaf || path is ZkRootTreeNode)})
     }
 
     inner class RefreshAction : AnAction("Refresh","Refresh Zookeeper cluster node", REFRESH_ICON) {
@@ -405,7 +392,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         }
 
         override fun update (e: AnActionEvent) {
-            e.getPresentation().setEnabled(tree.selectionPaths != null && tree.selectionPaths.size > 0);
+            e.getPresentation().setEnabled(tree.selectionPaths != null && tree.selectionPaths.size > 0)
         }
     }
 
@@ -424,7 +411,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
     }
 
     fun background(title: String, task: () -> Unit) {
-        Notifications.Bus.notify(Notification("ApplicationName", "MethodName", title, NotificationType.INFORMATION));
+        Notifications.Bus.notify(Notification("ApplicationName", "MethodName", title, NotificationType.INFORMATION))
         ApplicationManager.getApplication().invokeLater({
             ProgressManager.getInstance().run(object: Task.Backgroundable(project, title, false) {
                 override fun run(indicator: ProgressIndicator) {
