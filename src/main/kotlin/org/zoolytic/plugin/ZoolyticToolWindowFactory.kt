@@ -91,18 +91,16 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         tree.expandPath(TreePath(zRoot))
 
         tree.cellRenderer = ZkTreeCellRenderer()
-        tree.addTreeSelectionListener(object : TreeSelectionListener {
-            override fun valueChanged(e: TreeSelectionEvent?) {
-                val node = e?.path?.lastPathComponent  as DefaultMutableTreeNode
-                if (node == null) {
-                    removeButton.templatePresentation.isEnabled = false
-                } else {
-                    removeButton.templatePresentation.setEnabled(true)
-                    LOG.info("remove enabled:" + removeButton.templatePresentation.isEnabled)
-                    tableModel.updateDetails(node)
-                }
+        tree.addTreeSelectionListener {
+            val node = it?.path?.lastPathComponent  as DefaultMutableTreeNode
+            if (node == null) {
+                removeButton.templatePresentation.isEnabled = false
+            } else {
+                removeButton.templatePresentation.setEnabled(true)
+                LOG.info("remove enabled:" + removeButton.templatePresentation.isEnabled)
+                tableModel.updateDetails(node)
             }
-        })
+        }
 
         tree.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
@@ -111,9 +109,9 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                     if (paths.size == 0) {
                         return
                     }
-                    val allConnected =  tree.selectionPaths.fold(true, {a, v ->
+                    val allConnected =  tree.selectionPaths.fold(true) {a, v ->
                         val path = v.lastPathComponent
-                        a && (path is ZkTreeNode) && path.isConnected()})
+                        a && (path is ZkTreeNode) && path.isConnected()}
 
                     val menu = object: JPopupMenu() {
                         fun add(name: String, task: () -> Unit) {
@@ -125,18 +123,18 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                         }
                     }
                     if (allConnected) {
-                        menu.add("Collect size info", {
-                            background("Collecting size information for Zookeeper tree", {
+                        menu.add("Collect size info") {
+                            background("Collecting size information for Zookeeper tree") {
                                 paths.forEach {
                                     (it.lastPathComponent as ZkTreeNode).collectSize()
                                     LOG.info("calc complete")
                                     treeModel.reload(it.lastPathComponent as TreeNode)
                                     LOG.info("model reloaded")
                                 }
-                            })
-                        })
-                        menu.add("Report size info", {
-                            background("Collecting size information for Zookeeper tree", {
+                            }
+                        }
+                        menu.add("Report size info") {
+                            background("Collecting size information for Zookeeper tree") {
                                 paths.forEach {
                                     val nodeData = (it.lastPathComponent as ZkTreeNode).getNodeData()
                                     val file = File.createTempFile("report", "txt")
@@ -146,8 +144,8 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                                     ApplicationManager.getApplication().invokeLater({FileEditorManager.getInstance(project!!).openFile(vfile!!, false)})
                                     LOG.info("calc complete")
                                 }
-                            })
-                        })
+                            }
+                        }
                     }
 
                     if (paths.size == 1) {
@@ -155,21 +153,21 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                         if (node is ZkRootTreeNode) {
                             val cluster = node.getNodeData().text
                             if (node.isConnected()) {
-                                menu.add("Disconnect", {
+                                menu.add("Disconnect") {
                                     ZkUtils.disconnect(cluster)
                                     disconnected(cluster)
-                                })
+                                }
                             } else {
-                                menu.add("Connect", {
-                                    background("Connecting to cluster:" + cluster, {
+                                menu.add("Connect") {
+                                    background("Connecting to cluster:" + cluster) {
                                         try {
                                             node.expand(true)
                                             treeModel.reload()
                                         } catch (e: IOException) {
                                             error("Cannot connect:" + e.message, e)
                                         }
-                                    })
-                                })
+                                    }
+                                }
                             }
                         }
                         if (allConnected) {
@@ -178,16 +176,16 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                             } else {
                                 menu.add("Create node", {addNode(paths)})
                             }
-                            menu.add("Select", {
+                            menu.add("Select") {
                                 val pattern = Messages.showInputDialog("Enter selection regexp", "Select nodes", Messages.getQuestionIcon())
                                 if (pattern != null && pattern.length > 0) {
                                     val parent = paths.first().lastPathComponent as ZkTreeNode
-                                    tree.selectionModel.selectionPaths = (parent.children().asSequence().filter { Pattern.matches(pattern, (it as ZkTreeNode).getNodeData().text) }.map({
+                                    tree.selectionModel.selectionPaths = (parent.children().asSequence().filter { Pattern.matches(pattern, (it as ZkTreeNode).getNodeData().text) }.map{
                                         TreePath((tree.getModel() as DefaultTreeModel).getPathToRoot(it as TreeNode))
-                                    }).toList()).toTypedArray()
+                                    }.toList()).toTypedArray()
                                     info(tree.selectionModel.selectionPaths.size.toString() + " nodes were selected.")
                                 }
-                            })
+                            }
                         }
                     }
                     if (removeEnabled()) {
@@ -202,9 +200,9 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         tree.addTreeExpansionListener(object : TreeExpansionListener {
             override fun treeExpanded(event: TreeExpansionEvent?) {
                 val treeNode = event!!.getPath().lastPathComponent as DefaultMutableTreeNode
-                background("Expanding " + treeNode.userObject, {
+                background("Expanding " + treeNode.userObject) {
                     treeNode.children().asSequence().forEach{(it as ZkTreeNode).expand()}
-                })
+                }
             }
 
             override fun treeCollapsed(event: TreeExpansionEvent?) {
@@ -248,7 +246,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         if (dialog.exitCode == Messages.OK) {
             val nodeName = dialog.inputString
             if (nodeName != null && nodeName.length > 0) {
-                background("Creating Zookeeper node", {
+                background("Creating Zookeeper node") {
                     try {
                         val parent = paths.first().lastPathComponent as ZkTreeNode
                         val path = parent.createChildNode(nodeName, CreateMode.fromFlag(dialog.getMode()!!))
@@ -257,7 +255,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                     } catch (e: Exception) {
                         error(nodeName + " node was not created ", e)
                     }
-                })
+                }
             }
         }
     }
@@ -274,10 +272,9 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
     private fun removeNode() {
         val paths = tree.selectionPaths
         if (Messages.OK == Messages.showOkCancelDialog(
-                        paths.fold("You are about to delete following nodes ",
-                                { a, v -> a + "\n" + v.lastPathComponent.toString() }),
+                        paths.fold("You are about to delete following nodes ") {a, v -> a + "\n" + v.lastPathComponent.toString()},
                         "Zookeeper", Messages.getQuestionIcon())) {
-            background("Deleting Zookeeper node", {
+            background("Deleting Zookeeper node") {
                 var deleted: List<String>? = null
                 try {
                     deleted = paths.filter { !(it.lastPathComponent is ZkRootTreeNode) }.map {
@@ -298,7 +295,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                 if (deleted != null) {
                     info(deleted.joinToString("\n") + "\nwas deleted")
                 }
-            })
+            }
         }
     }
 
@@ -335,7 +332,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
     private fun addCluster() {
         val cluster = Messages.showInputDialog("Enter address for one o more nodes for Zookeeper cluster", "Add Zookeeper cluster", Messages.getQuestionIcon())
         if (cluster != null && cluster.length > 0) {
-            background("Adding Zookeeper cluster " + cluster, {
+            background("Adding Zookeeper cluster ${cluster}") {
                 try {
                     ZkUtils.getZk(cluster)
                     zRoot.add(ZkRootTreeNode(cluster, ZWatcher(this, cluster)))
@@ -343,9 +340,9 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                     config.clusters.add(cluster)
                     LOG.info("Cluster " + cluster + " added to config, " + config.clusters)
                 } catch (e: IOException) {
-                    error("Cannot connect to " + cluster, e)
+                    error("Cannot connect to ${cluster}", e)
                 }
-            })
+            }
         }
     }
 
@@ -369,9 +366,9 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         if (tree.selectionPaths == null) {
             return false
         }
-        return tree.selectionPaths.fold(true, {a, v ->
+        return tree.selectionPaths.fold(true) {a, v ->
             val path = v.lastPathComponent
-            a && (path is ZkTreeNode) && (path.isLeaf || path is ZkRootTreeNode)})
+            a && (path is ZkTreeNode) && (path.isLeaf || path is ZkRootTreeNode)}
     }
 
     inner class RefreshAction : AnAction("Refresh","Refresh Zookeeper cluster node", REFRESH_ICON) {
@@ -379,14 +376,14 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
             tree.selectionPaths.forEach {
                 val node = it.lastPathComponent
                 if (node is ZkTreeNode) {
-                    background ("Refreshing zookeeper",{
+                    background ("Refreshing zookeeper") {
                         LOG.info("Refreshing " + node.userObject)
                         node.refresh()
                         treeModel.reload(node)
                         if (tree.isExpanded(it)) {
                             node.children().asSequence().forEach {(it as ZkTreeNode).expand()}
                         }
-                    })
+                    }
                 }
             }
         }
@@ -398,28 +395,28 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
 
     private fun error(message: String, e: Exception) {
         LOG.error(message, e)
-        ApplicationManager.getApplication().invokeLater({
+        ApplicationManager.getApplication().invokeLater{
             Messages.showErrorDialog(message + e.toString(), "Zookeeper")
-        })
+        }
     }
 
     private fun info(message: String) {
         LOG.info(message)
-        ApplicationManager.getApplication().invokeLater({
+        ApplicationManager.getApplication().invokeLater {
             Messages.showInfoMessage(message, "Zookeeper")
-        })
+        }
     }
 
     fun background(title: String, task: () -> Unit) {
         Notifications.Bus.notify(Notification("ApplicationName", "MethodName", title, NotificationType.INFORMATION))
-        ApplicationManager.getApplication().invokeLater({
+        ApplicationManager.getApplication().invokeLater {
             ProgressManager.getInstance().run(object: Task.Backgroundable(project, title, false) {
                 override fun run(indicator: ProgressIndicator) {
                     task()
-                    LOG.info("background task complete:" + title)
+                    LOG.info("background task complete:${title}")
                 }
             })
-        })
+        }
     }
 
     fun disconnected(address: String) {
@@ -442,7 +439,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
 
 class ZWatcher(val factory: ZoolyticToolWindowFactory, val address: String): Watcher {
     override fun process(event: WatchedEvent?) {
-        if (event?.getState() == Watcher.Event.KeeperState.Disconnected) {
+        if (event?.state == Watcher.Event.KeeperState.Disconnected) {
             factory.disconnected(address)
         }
     }
