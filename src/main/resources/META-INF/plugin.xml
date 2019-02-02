@@ -1,13 +1,15 @@
 <idea-plugin>
-    <id>org.ermadan.zoolytic</id>
+    <id>org.zoolytic</id>
     <name>zoolytic</name>
     <vendor email="danila.ermakov@gmail.com">Danila Ermakov</vendor>
 
-    <description>Zookeeper analysis tool</description>
+    <description>Zookeeper analysis tool. Allows to connect to Zookeeper cluster, manage zkNodes, collect statistics</description>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="org.zoolytic.plugin.ZooStateComponent"/>
 
         <toolWindow id="zoolytic" anchor="right" factoryClass="org.zoolytic.plugin.ZoolyticToolWindowFactory"/>
     </extensions>
+    <change-notes>Initial version, supported: nodes browsing, stats collection</change-notes>
+    <idea-version since-build="181.4505.22"/>
 </idea-plugin>

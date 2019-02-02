@@ -334,8 +334,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         if (cluster != null && cluster.length > 0) {
             background("Adding Zookeeper cluster ${cluster}") {
                 try {
-                    ZkUtils.getZk(cluster)
-                    zRoot.add(ZkRootTreeNode(cluster, ZWatcher(this, cluster)))
+                    zRoot.add(getZkTree(cluster))
                     treeModel.reload(zRoot)
                     config.clusters.add(cluster)
                     LOG.info("Cluster " + cluster + " added to config, " + config.clusters)

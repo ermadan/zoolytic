@@ -17,8 +17,8 @@ apply plugin: 'idea'
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
 
-group 'org.ermadan'
-version '1.0-SNAPSHOT'
+group 'org.zoolytic'
+version '0.2'
 
 apply plugin: 'kotlin'
 
@@ -41,9 +41,18 @@ intellij {
     version '2018.1.2'
     plugins 'coverage' //Bundled plugin dependencies
     pluginName 'Zoolytic'
+    updateSinceUntilBuild false
+    publish.channel("alpha")
+    dependencies
 }
 patchPluginXml {
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      Initial version, supported: nodes browsing, stats collection
+      """
 }
+
+publishPlugin {
+    username intellijPublishUsername
+    password intellijPublishPassword
+}
+
