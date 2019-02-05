@@ -12,6 +12,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -325,7 +326,17 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
     }
 
     private fun addCluster() {
-        val cluster = Messages.showInputDialog("Enter address for one o more nodes for Zookeeper cluster", "Add Zookeeper cluster", Messages.getQuestionIcon())
+        val cluster = Messages.showInputDialog("Enter Zookeeper connection string (comma separated host:port list)",
+                "Add Zookeeper cluster", Messages.getQuestionIcon(), null, object: InputValidator {
+            //domainname:port
+            private val matcher = """([a-zA-Z0-9.-]+:[0-9]{1,5},)*([a-zA-Z0-9-]+\.)*([a-zA-Z0-9-])+:[0-9]{1,5}""".toRegex()
+            override fun checkInput(inputString: String?) = if (inputString == null) {
+                false
+            } else {
+                matcher.matches(inputString)
+            }
+            override fun canClose(inputString: String?) = inputString != null && checkInput(inputString)
+        })
         if (cluster != null && cluster.length > 0) {
             background("Adding Zookeeper cluster ${cluster}") {
                 try {
