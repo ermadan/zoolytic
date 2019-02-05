@@ -11,31 +11,31 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 object ZkUtils {
-//    private val LOG = Logger.getInstance("zoolytic")
+    private val LOG = Logger.getInstance("zoolytic")
     private val zookeepers = HashMap<String, ZooKeeper>()
 
     @Throws(IOException::class, InterruptedException::class)
     fun getZk(source: String): ZooKeeper {
         val latch = CountDownLatch(1)
         var zk: ZooKeeper? = zookeepers[source]
-//        LOG.info("Found zk:" + zk)
+        LOG.info("Found zk:$zk")
         if (zk != null && zk.state != ZooKeeper.States.CONNECTED) {
             zk = null
         }
         if (zk == null) {
-//            LOG.info("Establishing connection....")
+            LOG.info("Establishing connection....")
             zk = ZooKeeper(source, 1000) { event: WatchedEvent ->
-//                LOG.info("evnt:" + event)
+                LOG.info("evnt:$event")
                 if (event.state == Watcher.Event.KeeperState.SyncConnected) {
                     latch.countDown()
                 }
             }
             if (latch.await(10, TimeUnit.SECONDS)) {
                 zookeepers[source] = zk
-//                LOG.info("Connection established")
+                LOG.info("Connection established")
             } else {
-//                LOG.info("Connection timed out")
-                throw IOException("Couldnt establish connection: " + source)
+                LOG.info("Connection timed out")
+                throw IOException("Couldnt establish connection: $source")
             }
         }
         return zk
@@ -48,9 +48,9 @@ object ZkUtils {
     fun format(size: Int) =
             " (" + if (size > 1000) {
                 if (size > 1000_000) {
-                    (size / 1000_000 as Int).toString() + "M"
+                    (size / 1000_000).toString() + "M"
                 } else {
-                    (size / 1000 as Int).toString() + "K"
+                    (size / 1000).toString() + "K"
                 }
             } else {
                 size
@@ -73,6 +73,5 @@ object ZkUtils {
         }
         return 0;
     }
-
 }
 
