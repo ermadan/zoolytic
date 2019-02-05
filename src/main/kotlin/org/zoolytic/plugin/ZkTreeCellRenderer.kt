@@ -21,7 +21,7 @@ class ZkTreeCellRenderer() : ColoredTreeCellRenderer() {
         if (node is ZkTreeNode) {
             if (node is ZkRootTreeNode) {
                 append(node.getNodeData().text, SimpleTextAttributes.REGULAR_ATTRIBUTES)
-                append(" (" + (if (node.isConnected()) {"coonected"} else "disconnected") + ")", SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES)
+                append(" (" + (if (node.isConnected()) "" else "dis") + "connected)", SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES)
             } else {
                 append(node.getNodeData().text, SimpleTextAttributes.REGULAR_ATTRIBUTES)
                 append(node.getNodeData().getSizeString(), SimpleTextAttributes.GRAY_ITALIC_ATTRIBUTES)

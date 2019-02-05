@@ -14,12 +14,12 @@ class ZooStateComponent : PersistentStateComponent<ZooStateComponent> {
     public var clusters: java.util.List<String> = java.util.ArrayList<String>() as List<String>
 
     override fun getState(): ZooStateComponent {
-        LOG.info("Save state:" + clusters)
+        LOG.info("Save state:$clusters")
         return this
     }
 
     override fun loadState(state: ZooStateComponent) {
-        LOG.info("Load state:" + state)
+        LOG.info("Load state:$state")
         XmlSerializerUtil.copyBean(state, this);
     }
 }

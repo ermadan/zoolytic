@@ -18,8 +18,6 @@ import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import com.intellij.ui.DocumentAdapter
-import com.intellij.ui.SearchTextField
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.table.JBTable
@@ -58,21 +56,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
     private val removeButton by lazy {RemoveAction()}
     private var actionToolBar: ActionToolbar? = null
 
-    val config: ZooStateComponent = ServiceManager.getService(ZooStateComponent::class.java)
-
-    companion object Formatter {
-        private val formatter = NumberFormat.getInstance(Locale.US) as DecimalFormat
-
-        init {
-            val symbols = formatter.getDecimalFormatSymbols()
-            symbols.setGroupingSeparator(' ')
-            formatter.setDecimalFormatSymbols(symbols)
-        }
-
-        fun format(int: Int) : String {
-            return formatter.format(int)
-        }
-    }
+    private val config: ZooStateComponent = ServiceManager.getService(ZooStateComponent::class.java)
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         this.project = project
@@ -189,7 +173,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                             }
                         }
                     }
-                    if (removeEnabled()) {
+                    if (isRemoveEnabled()) {
                         menu.add("Delete node(s)", {remove()})
                     }
                     menu.show(tree, e.x, e.y)
@@ -328,24 +312,20 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
     private fun addCluster() {
         val cluster = Messages.showInputDialog("Enter Zookeeper connection string (comma separated host:port list)",
                 "Add Zookeeper cluster", Messages.getQuestionIcon(), null, object: InputValidator {
-            //domainname:port
+            //host:port,
             private val matcher = """([a-zA-Z0-9.-]+:[0-9]{1,5},)*([a-zA-Z0-9-]+\.)*([a-zA-Z0-9-])+:[0-9]{1,5}""".toRegex()
-            override fun checkInput(inputString: String?) = if (inputString == null) {
-                false
-            } else {
-                matcher.matches(inputString)
-            }
-            override fun canClose(inputString: String?) = inputString != null && checkInput(inputString)
+            override fun checkInput(inputString: String?) = inputString != null && matcher.matches(inputString)
+            override fun canClose(inputString: String?) = checkInput(inputString)
         })
-        if (cluster != null && cluster.length > 0) {
-            background("Adding Zookeeper cluster ${cluster}") {
+        if (cluster != null && cluster.isNotEmpty()) {
+            background("Adding Zookeeper cluster $cluster") {
                 try {
                     zRoot.add(getZkTree(cluster))
                     treeModel.reload(zRoot)
                     config.clusters.add(cluster)
                     LOG.info("Cluster " + cluster + " added to config, " + config.clusters)
                 } catch (e: IOException) {
-                    error("Cannot connect to ${cluster}", e)
+                    error("Cannot connect to $cluster", e)
                 }
             }
         }
@@ -363,11 +343,11 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         }
 
         override fun update (e: AnActionEvent) {
-            e.getPresentation().setEnabled(removeEnabled())
+            e.presentation.isEnabled = isRemoveEnabled()
         }
     }
 
-    private fun removeEnabled(): Boolean {
+    private fun isRemoveEnabled(): Boolean {
         if (tree.selectionPaths == null) {
             return false
         }
@@ -394,7 +374,7 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         }
 
         override fun update (e: AnActionEvent) {
-            e.getPresentation().setEnabled(tree.selectionPaths != null && tree.selectionPaths.size > 0)
+            e.presentation.isEnabled = tree.selectionPaths != null && tree.selectionPaths.isNotEmpty()
         }
     }
 

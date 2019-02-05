@@ -24,7 +24,7 @@ class TableModel : DefaultTableModel() {
     fun updateDetails(node: DefaultMutableTreeNode) {
         if (node is ZkTreeNode) {
             val nodeData = node.getNodeData()
-            with(nodeData, {
+            with(nodeData) {
                 setValueAt(getFullPath(), 0, 1)
                 LOG.info("reading data")
                 setValueAt(if (data == null) {""} else {String(data!!)}, 1, 1)
@@ -32,14 +32,14 @@ class TableModel : DefaultTableModel() {
                 if (stat == null) {
                     (2..5).forEach { setValueAt("", it, 1) }
                 } else {
-                    setValueAt(stat?.getDataLength(), 2, 1)
-                    setValueAt(stat?.getVersion(), 3, 1)
-                    setValueAt(Date(stat!!.getMtime()), 4, 1)
+                    setValueAt(stat?.dataLength, 2, 1)
+                    setValueAt(stat?.version, 3, 1)
+                    setValueAt(Date(stat!!.mtime), 4, 1)
                     setValueAt(stat.toString(), 5, 1)
                 }
                 LOG.info("reading data10")
 
-            })
+            }
         }
     }
 }

@@ -15,10 +15,10 @@ class CreateNodeDialog() : Messages.InputDialog(
         null,
         object: InputValidator {
             override fun checkInput(inputString: String?) = true
-            override fun canClose(inputString: String?) = inputString != null && inputString.length > 0
+            override fun canClose(inputString: String?) = inputString != null && inputString.isNotEmpty()
         }) {
 
-    private var radios: Array<JRadioButton>? = null
+    private lateinit var radios: Array<JRadioButton>
 
     override fun createMessagePanel(): JPanel {
         val messagePanel = JPanel(BorderLayout())
@@ -32,10 +32,10 @@ class CreateNodeDialog() : Messages.InputDialog(
 
         val radioPane = JPanel(GridLayout(0, 2))
         radios = arrayOf(javax.swing.JRadioButton("Persistent"), JRadioButton("Ephimeral"), JRadioButton("Persistent Sequential"), JRadioButton("Ephimeral Sequential"))
-        radios!![0].isSelected = true
+        radios[0].isSelected = true
         val group = ButtonGroup()
-        radios!!.forEach {
-            group.add(it);
+        radios.forEach {
+            group.add(it)
             radioPane.add(it)
         }
         messagePanel.add(radioPane, BorderLayout.SOUTH)
@@ -44,7 +44,7 @@ class CreateNodeDialog() : Messages.InputDialog(
     }
 
     fun getMode(): Int? {
-        return (0..radios!!.size).asSequence().find{radios!![it].isSelected}
+        return (0..radios.size).asSequence().find{ radios[it].isSelected }
     }
 }
 

@@ -84,7 +84,7 @@ open class ZkTreeNode(userObject: Any?) : DefaultMutableTreeNode(userObject) {
         expand(true)
     }
 
-    fun addChildren(children: MutableList<String>?): Unit {
+    fun addChildren(children: MutableList<String>?) {
         LOG.info("addChildren")
         if (children != null) {
             children.sorted().forEach {

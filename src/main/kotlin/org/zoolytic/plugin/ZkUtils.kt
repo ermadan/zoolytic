@@ -69,7 +69,7 @@ object ZkUtils {
             return total;
         } catch (e: Exception) {
             e.printStackTrace();
-            System.out.println(e);
+            LOG.error("Cannot count", e);
         }
         return 0;
     }
