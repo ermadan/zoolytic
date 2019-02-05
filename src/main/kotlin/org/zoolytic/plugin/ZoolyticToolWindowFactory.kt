@@ -278,15 +278,10 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
                 var deleted: List<String>? = null
                 try {
                     deleted = paths.filter { !(it.lastPathComponent is ZkRootTreeNode) }.map {
-                        LOG.info("1")
                         val child = it.lastPathComponent as ZkTreeNode
-                        LOG.info("2")
                         val parent = child.parent as ZkTreeNode
-                        LOG.info("3")
                         parent.deleteNode(child)
-                        LOG.info("4")
                         treeModel.reload(parent)
-                        LOG.info("5")
                         child.getNodeData().getFullPath()
                     }
                 } catch (e: Exception) {
