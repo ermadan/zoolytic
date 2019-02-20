@@ -18,7 +18,7 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
 
 group 'org.zoolytic'
-version '0.2'
+version '0.4'
 
 apply plugin: 'kotlin'
 
@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.apache.zookeeper:zookeeper:3.4.5"
+    compile "org.apache.zookeeper:zookeeper:3.4.13"
 }
 
 compileKotlin {
@@ -47,7 +47,7 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      Initial version, supported: nodes browsing, stats collection
+      Text search by node names added
       """
 }
 
