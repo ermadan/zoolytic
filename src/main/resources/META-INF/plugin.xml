@@ -3,13 +3,20 @@
     <name>zoolytic</name>
     <vendor email="danila.ermakov@gmail.com">Danila Ermakov</vendor>
 
-    <description>Zookeeper analysis tool. Allows to connect to Zookeeper cluster, manage zkNodes, collect statistics</description>
+    <description>Zookeeper analysis tool.
+        To open - go to View->Tool windows->Zoolytic
+        Multiple clusters support
+        zkNodes management - add/remove/edit
+        collects size information for all nodes in the tree
+        Regex search of nodes by names
+
+    </description>
 
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="org.zoolytic.plugin.ZooStateComponent"/>
 
         <toolWindow id="zoolytic" anchor="right" factoryClass="org.zoolytic.plugin.ZoolyticToolWindowFactory"/>
     </extensions>
-    <change-notes>Initial version, supported: nodes browsing, stats collection</change-notes>
+    <change-notes>Text search by node names added</change-notes>
     <idea-version since-build="181.4505.22"/>
 </idea-plugin>
