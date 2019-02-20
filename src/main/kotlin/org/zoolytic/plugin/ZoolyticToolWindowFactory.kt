@@ -18,6 +18,8 @@ import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.ui.DocumentAdapter
+import com.intellij.ui.SearchTextField
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.table.JBTable
@@ -305,8 +307,36 @@ class ZoolyticToolWindowFactory : ToolWindowFactory {
         actionToolBar = ActionManager.getInstance().createActionToolbar("CabalTool", group, true)
 
         panel.add(actionToolBar!!.component!!)
+        val searchTextField = SearchTextField()
+        searchTextField.addDocumentListener(object : DocumentAdapter() {
+            override fun textChanged(e: DocumentEvent?) {
+                updateText(searchTextField.text!!)
+            }
+        })
+        panel.add(searchTextField)
 
         return panel
+    }
+
+    private fun updateText(text: String) {
+        tree.selectionModel.selectionPaths = if (text.length < 2) {
+            arrayOf()
+        } else {
+            select(zRoot, ".*$text.*".toRegex())
+                    .asSequence()
+                    .map{ TreePath((tree.model as DefaultTreeModel).getPathToRoot(it as TreeNode))}
+                    .toList()
+                    .toTypedArray()
+        }
+    }
+
+    fun select(node: DefaultMutableTreeNode, regex: Regex) : List<DefaultMutableTreeNode> {
+        val selected = ArrayList<DefaultMutableTreeNode>()
+        if (regex.matches(node.toString())) {
+            selected.add(node)
+        }
+        node.children().iterator().forEach { selected.addAll(select(it as DefaultMutableTreeNode, regex)) }
+        return selected
     }
 
     private fun addCluster() {
