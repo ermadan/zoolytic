@@ -17,6 +17,6 @@
 
         <toolWindow id="zoolytic" anchor="right" factoryClass="org.zoolytic.plugin.ZoolyticToolWindowFactory"/>
     </extensions>
-    <change-notes>Text search by node names added</change-notes>
+    <change-notes>bugfix release</change-notes>
     <idea-version since-build="181.4505.22"/>
 </idea-plugin>
