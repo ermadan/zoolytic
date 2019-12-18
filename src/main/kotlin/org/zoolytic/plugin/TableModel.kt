@@ -7,27 +7,29 @@ import javax.swing.tree.DefaultMutableTreeNode
 
 class TableModel : DefaultTableModel() {
     private val LOG = Logger.getInstance(this.javaClass)
+    private var editable = false;
 
     fun init() {
         addColumn("Property")
         addColumn("value")
-        arrayOf("Path", "Data", "Size", "Version", "Mod Date", "Stat").forEach { addRow(arrayOf(it, "")) }
     }
 
-    override fun isCellEditable(row: Int, column: Int): Boolean {
-        if (row == 1 && column == 1) {
-            return true
-        }
-        return false
-    }
+    override fun isCellEditable(row: Int, column: Int) = editable && row == 1 && column == 1
 
     fun updateDetails(node: DefaultMutableTreeNode) {
-        if (node is ZkTreeNode) {
+        dataVector.clear()
+        if (node is ZkRootTreeNode) {
+            editable = false
+            node.getNodeData()
+            addRow(arrayOf("Url", node.getNodeData().text))
+        } else if (node is ZkTreeNode) {
+            editable = true
+            arrayOf("Path", "Data", "Size", "Version", "Mod Date", "Stat").forEach { addRow(arrayOf(it, "")) }
             val nodeData = node.getNodeData()
             with(nodeData) {
                 setValueAt(getFullPath(), 0, 1)
                 LOG.info("reading data")
-                setValueAt(if (data == null) {""} else {String(data!!)}, 1, 1)
+                setValueAt(data ?: "", 1, 1)
                 LOG.info("reading data2")
                 if (stat == null) {
                     (2..5).forEach { setValueAt("", it, 1) }
@@ -38,7 +40,6 @@ class TableModel : DefaultTableModel() {
                     setValueAt(stat.toString(), 5, 1)
                 }
                 LOG.info("reading data10")
-
             }
         }
     }
