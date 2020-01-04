@@ -29,7 +29,7 @@ class TableModel : DefaultTableModel() {
             with(nodeData) {
                 setValueAt(getFullPath(), 0, 1)
                 LOG.info("reading data")
-                setValueAt(data ?: "", 1, 1)
+                setValueAt(data?.let { String(it) } ?: "", 1, 1)
                 LOG.info("reading data2")
                 if (stat == null) {
                     (2..5).forEach { setValueAt("", it, 1) }
