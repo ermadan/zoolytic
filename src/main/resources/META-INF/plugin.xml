@@ -1,15 +1,18 @@
 <idea-plugin>
     <id>org.zoolytic</id>
-    <name>zoolytic</name>
+    <name>Zoolytic - Zookeeper tool</name>
     <vendor email="danila.ermakov@gmail.com">Danila Ermakov</vendor>
 
-    <description>Zookeeper analysis tool.
-        To open - go to View->Tool windows->Zoolytic
-        Multiple clusters support
-        zkNodes management - add/remove/edit
-        collects size information for all nodes in the tree
-        Regex search of nodes by names
-
+    <description>
+        &lt;h4&gt;Zookeeper analysis tool.&lt;/h4&gt;
+        &lt;br&gt;To open - go to View->Tool windows->Zoolytic
+        &lt;ul&gt;
+            &lt;li&gt;Multiple clusters support&lt;/li&gt;
+            &lt;li&gt;ZkNodes node management - add/remove&lt;/li&gt;
+            &lt;li&gt;Edit zkNodes data&lt;/li&gt;
+            &lt;li&gt;Gathers size information for all nodes in the tree&lt;/li&gt;
+            &lt;li&gt;Regex search by node names&lt;/li&gt;
+        &lt;/ul&gt;
     </description>
 
     <extensions defaultExtensionNs="com.intellij">

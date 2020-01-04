@@ -18,7 +18,7 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
 
 group 'org.zoolytic'
-version '0.4'
+version '0.5.1'
 
 apply plugin: 'kotlin'
 
