@@ -294,7 +294,7 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
         val cluster = Messages.showInputDialog("Enter Zookeeper connection string (comma separated host:port list)",
                 "Add Zookeeper cluster", Messages.getQuestionIcon(), null, object: InputValidator {
             //host:port,
-            private val matcher = """([a-zA-Z0-9.-]+:[0-9]{1,5},)*([a-zA-Z0-9-]+\.)*([a-zA-Z0-9-])+:[0-9]{1,5}""".toRegex()
+            private val matcher = """([a-zA-Z0-9.-_]+:[0-9]{1,5},)*([a-zA-Z0-9-_]+\.)*([a-zA-Z0-9-_])+:[0-9]{1,5}""".toRegex()
             override fun checkInput(inputString: String?) = inputString != null && matcher.matches(inputString)
             override fun canClose(inputString: String?) = checkInput(inputString)
         })
