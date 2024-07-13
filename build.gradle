@@ -1,24 +1,11 @@
-buildscript {
-    ext.kotlin_version = '1.3.41'
-
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.2'
+    id 'org.jetbrains.intellij' version '1.17.4'
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.24'
 }
-
-apply plugin: 'idea'
-apply plugin: 'org.jetbrains.intellij'
-apply plugin: 'java'
 
 group 'org.zoolytic'
-version '0.5.1'
+version '0.5.2'
 
 apply plugin: 'kotlin'
 
@@ -27,8 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "org.apache.zookeeper:zookeeper:3.4.5"
+    implementation "org.apache.zookeeper:zookeeper:3.4.5"
 }
 
 compileKotlin {
@@ -37,15 +23,15 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
 intellij {
-    version '2018.1.2'
-    plugins 'coverage' //Bundled plugin dependencies
-    pluginName 'Zoolytic'
-    updateSinceUntilBuild false
+    version = '2024.1.2'
+    pluginName ='Zoolytic'
+    updateSinceUntilBuild = false
 }
+
 patchPluginXml {
-    changeNotes """
+    changeNotes = """
       bugfix release
       """
 }
-

@@ -1,12 +1,10 @@
 package org.zoolytic.plugin
 
+import com.intellij.icons.AllIcons
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -16,7 +14,6 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.InputValidator
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.table.JBTable
@@ -41,9 +38,10 @@ import javax.swing.tree.*
 
 class MainWindow(stateComponent: ZooStateComponent, private val project: Project) : JPanel(BorderLayout()) {
     private val LOG = Logger.getInstance("zoolytic")
-    private val ADD_ICON by lazy { IconLoader.getIcon("/general/add.png")}
-    private val REMOVE_ICON by lazy { IconLoader.getIcon("/general/remove.png")}
-    private val REFRESH_ICON by lazy { IconLoader.getIcon("/actions/refresh.png")}
+
+    private val ADD_ICON = AllIcons.Actions.AddList
+    private val REMOVE_ICON = AllIcons.Actions.Cancel
+    private val REFRESH_ICON = AllIcons.Actions.Refresh
     private val zRoot by lazy { DefaultMutableTreeNode("Zookeeper") }
     private val treeModel by lazy { DefaultTreeModel(zRoot) }
     private val tree by lazy { Tree(treeModel) }
@@ -56,14 +54,12 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
         val toolPanel = JPanel(BorderLayout())
         toolPanel.add(getToolbar(), BorderLayout.PAGE_START)
 
-
         config.clusters.forEach{zRoot.add(getZkTree(it))}
         tree.expandPath(TreePath(zRoot))
 
         tree.cellRenderer = ZkTreeCellRenderer()
         tree.addTreeSelectionListener {
             val node = it?.path?.lastPathComponent  as DefaultMutableTreeNode
-            removeButton.templatePresentation.isEnabled = node != null
             if (node != null) {
                 tableModel.updateDetails(node)
             }
@@ -105,9 +101,9 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
                                 paths.forEach {
                                     val nodeData = (it.lastPathComponent as ZkTreeNode).getNodeData()
                                     val file = File.createTempFile("report", "txt")
-//                                    val file = ScratchRootType.getInstance().createScratchFile(project, "report", Language.ANY, "")
                                     ZkUtils.count(nodeData.zk!!, nodeData.getFullPath(), PrintWriter (file))
                                     val vfile = VirtualFileManager.getInstance().getFileSystem("file").findFileByPath(file.absolutePath)
+
                                     ApplicationManager.getApplication().invokeLater({ FileEditorManager.getInstance(project!!).openFile(vfile!!, false)})
                                     LOG.info("calc complete")
                                 }
@@ -282,10 +278,9 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
         group.add(refreshButton)
         group.add(addButton)
         group.add(removeButton)
-        removeButton.templatePresentation.isEnabled = false
 
         val actionToolBar = ActionManager.getInstance().createActionToolbar("CabalTool", group, true)
-
+        actionToolBar.targetComponent = actionToolBar.component!!
         panel.add(actionToolBar.component!!)
         return panel
     }
@@ -313,19 +308,23 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
     }
 
     inner class AddAction : AnAction("Add", "Add Zookeeper cluster node", ADD_ICON) {
-        override fun actionPerformed(e: AnActionEvent?) {
+        override fun actionPerformed(e: AnActionEvent) {
             addCluster()
         }
+
+        override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
     }
 
-    inner class RemoveAction : AnAction("Remove","Remove Zookeeper cluster node", REMOVE_ICON), AnAction.TransparentUpdate {
-        override fun actionPerformed(e: AnActionEvent?) {
+    inner class RemoveAction : AnAction("Remove","Remove Zookeeper cluster node", REMOVE_ICON) {
+        override fun actionPerformed(e: AnActionEvent) {
             removeCluster()
         }
 
         override fun update (e: AnActionEvent) {
             e.presentation.isEnabled = isRemoveEnabled()
         }
+
+        override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
     }
 
     private fun isRemoveEnabled(): Boolean {
@@ -338,7 +337,7 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
     }
 
     inner class RefreshAction : AnAction("Refresh","Refresh Zookeeper cluster node", REFRESH_ICON) {
-        override fun actionPerformed(e: AnActionEvent?) {
+        override fun actionPerformed(e: AnActionEvent) {
             tree.selectionPaths.forEach {
                 val node = it.lastPathComponent
                 if (node is ZkTreeNode) {
@@ -357,6 +356,8 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
         override fun update (e: AnActionEvent) {
             e.presentation.isEnabled = tree.selectionPaths != null && tree.selectionPaths.isNotEmpty()
         }
+
+        override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
     }
 
     private fun error(message: String, e: Exception) {
@@ -375,14 +376,14 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
 
     fun background(title: String, task: () -> Unit) {
         Notifications.Bus.notify(Notification("Zoolytic", "background process", title, NotificationType.INFORMATION))
-        ApplicationManager.getApplication().invokeLater {
-            ProgressManager.getInstance().run(object: Task.Backgroundable(project, title, false) {
-                override fun run(indicator: ProgressIndicator) {
+        ProgressManager.getInstance().run(object: Task.Backgroundable(project, title, false) {
+            override fun run(indicator: ProgressIndicator) {
+                ApplicationManager.getApplication().invokeLater {
                     task()
-                    LOG.info("background task complete:${title}")
                 }
-            })
-        }
+                LOG.info("background task complete:${title}")
+            }
+        })
     }
 
     fun disconnected(address: String) {
