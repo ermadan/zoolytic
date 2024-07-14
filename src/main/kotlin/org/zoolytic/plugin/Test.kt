@@ -3,7 +3,6 @@ package org.zoolytic.plugin
 import org.apache.zookeeper.WatchedEvent
 import org.apache.zookeeper.Watcher
 import org.apache.zookeeper.ZooKeeper
-import org.apache.zookeeper.data.Stat
 import java.io.IOException
 import java.util.HashMap
 import java.util.concurrent.CompletableFuture

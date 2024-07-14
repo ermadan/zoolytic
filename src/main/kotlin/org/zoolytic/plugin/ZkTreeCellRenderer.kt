@@ -2,13 +2,13 @@ package org.zoolytic.plugin
 
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.SimpleTextAttributes
-import sun.swing.DefaultLookup
 import javax.swing.JTree
+import javax.swing.UIManager
 
 class ZkTreeCellRenderer() : ColoredTreeCellRenderer() {
-    val leafIcon = DefaultLookup.getIcon(this, ui, "Tree.leafIcon")
-    val openIcon = DefaultLookup.getIcon(this, ui, "Tree.openIcon")
-    val closedIcon = DefaultLookup.getIcon(this, ui, "Tree.closedIcon")
+        val leafIcon = UIManager.getIcon("Tree.leafIcon")
+        val openIcon = UIManager.getIcon("Tree.openIcon")
+        val closedIcon = UIManager.getIcon("Tree.closedIcon")
 
     override fun customizeCellRenderer(tree: JTree, node: Any?, selected: Boolean, expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean) {
         if (leaf) {
