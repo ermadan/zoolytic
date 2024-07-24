@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>org.zoolytic</id>
-    <name>Zoolytic - Zookeeper tool</name>
+    <name>Zoolytic - the Zookeeper Tool</name>
     <vendor email="danila.ermakov@gmail.com">Danila Ermakov</vendor>
 
     <description>
@@ -14,12 +14,12 @@
             &lt;li&gt;Regex search by node names&lt;/li&gt;
         &lt;/ul&gt;
     </description>
-
+    <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="org.zoolytic.plugin.ZooStateComponent"/>
 
         <toolWindow id="zoolytic" anchor="right" factoryClass="org.zoolytic.plugin.ZoolyticToolWindowFactory"/>
     </extensions>
     <change-notes>bugfix release</change-notes>
-    <idea-version since-build="181.4505.22"/>
+    <idea-version since-build="241.18034.62"/>
 </idea-plugin>
