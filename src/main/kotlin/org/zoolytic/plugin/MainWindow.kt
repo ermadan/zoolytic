@@ -216,7 +216,7 @@ class MainWindow(stateComponent: ZooStateComponent, private val project: Project
                         info(path + " node was created with " + CreateMode.fromFlag(dialog.getMode()!!))
                         treeModel.reload(parent)
                     } catch (e: Exception) {
-                        error(nodeName + " node was not created ", e)
+                        error("$nodeName node was not created ", e)
                     }
                 }
             }
